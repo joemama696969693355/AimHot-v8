@@ -71,10 +71,14 @@ end
 
 local url = "https://raw.githubusercontent.com/joemama696969693355/AimHot-v8/refs/heads/master/UI.lua"
 
--- Use HttpGet for the executor
-local uiScriptContent = game:GetService("HttpService"):GetAsync(url)
+-- Using HttpService to get the script
+local HttpService = game:GetService("HttpService")
+local success, response = pcall(function()
+    return HttpService:GetAsync(url)
+end)
 
-if uiScriptContent then
+if success and response then
+    local uiScriptContent = response
     -- Create and inject the UI script content here
     local uiScript = Instance.new("LocalScript")
     uiScript.Source = uiScriptContent
