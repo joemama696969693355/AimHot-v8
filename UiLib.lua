@@ -1,33 +1,30 @@
---[[
-	UI Lib by Herrtt,
-	
-	This is an actual mess at this point
---]]
+--[[ 
+    UI Lib by Herrtt,
+
+    This is an actual mess at this point
+]]
 
 local userinput = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local newtweeninfo = TweenInfo.new
 local mouse = game:GetService("Players").LocalPlayer:GetMouse()
- 
 
 local connections = {}
 local function bindEvent(event, callback) -- Let me disconnect in peace
     local con = event:Connect(callback)
     table.insert(connections, con)
     return con
-end 
+end
 
 local function tween(obj, properties, time, callback)
     local tween = TweenService:Create(obj, newtweeninfo(time), properties)
     if callback then pcall(function() tween.Completed:Connect(callback) end) end
     return tween:Play()
 end
- 
- 
-local function floor(n,c)
-    return c * math.floor((n + c/2) / c)
+
+local function floor(n, c)
+    return c * math.floor((n + c / 2) / c)
 end
- 
 
 local tweenstuff = {
     Enum.EasingDirection.Out,
@@ -36,7 +33,6 @@ local tweenstuff = {
     true,
 }
 
- 
 local drag = {enabled = true}
 do
     local renderstepped = game:GetService("RunService").RenderStepped
@@ -44,9 +40,8 @@ do
    
     local dragging = false
     local mousedown = false
-   
+
     function drag:add(frame)
-       
         bindEvent(frame.InputBegan, function(key)
             if dragging then return end
             if key.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -56,7 +51,7 @@ do
                 while mousedown and drag.enabled do
                     local size = frame.Size
                     local anchorpoint = frame.AnchorPoint
-                    local x =  mouse.X - offset.X + (size.X.Offset * anchorpoint.X)
+                    local x = mouse.X - offset.X + (size.X.Offset * anchorpoint.X)
                     local y = mouse.Y - offset.Y + (size.Y.Offset * anchorpoint.Y)
                     frame:TweenPosition(UDim2.new(0, x, 0, y), unpack(tweenstuff))
                     renderstepped:Wait()
@@ -64,36 +59,16 @@ do
                 dragging = false
             end
         end)
- 
     end
-   
+
     bindEvent(userinput.InputEnded, function(key)
         if key.UserInputType == Enum.UserInputType.MouseButton1 then
             mousedown = false
         end
     end)
- 
+
 end
- 
- 
---[[local Looks = { -- : TODO
-    TextColor = Color3.new(1,1,1),
-   
-    Label = Color3.fromRGB(17, 17, 17),
-    Toggle = Color3.fromRGB(17, 17, 17),
-    Button = Color3.fromRGB(14, 14, 14) ,
-   
-    Rotate = Color3.fromRGB(17, 17, 17),
-    Slider = Color3.fromRGB(17, 17, 17),
-    Keybind = Color3.fromRGB(17,17,17),
-    ColorPicker = Color3.fromRGB(17,17,17),
-   
- 
-    Tab = Color3.fromRGB(20, 20, 20),
-    Category = Color3.fromRGB(14, 14, 14),
-    ToggleCategory = Color3.fromRGB(14, 14, 14),
-}--]]
- 
+
 local HttpService = game:GetService("HttpService")
 
 -- URL of the UI script
@@ -114,17 +89,28 @@ else
     warn("Failed to load the UI from the URL")
 end
 
-local parent
+-- Ensure the UI has been created
+local ui
 xpcall(function()
-	parent = game:GetService("CoreGui")
-	ui.Parent = parent
+    ui = script.Parent:WaitForChild("ui", 10)  -- Wait for the 'ui' child to exist, with a 10-second timeout
 end, function()
-	parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
-	ui.Parent = parent
+    warn("Failed to find 'ui' in the parent!")
+    return
 end)
 
-local templatesObj = ui:WaitForChild("Templates"):Clone()
-ui:WaitForChild("Templates"):Destroy()
+if ui then
+    -- Ensure that Templates exists before accessing it
+    local templatesObj = ui:FindFirstChild("Templates")
+    if templatesObj then
+        templatesObj = templatesObj:Clone()
+        templatesObj.Parent = ui
+        templatesObj:Destroy()  -- Destroy original Templates after cloning
+    else
+        warn("'Templates' not found in the UI!")
+    end
+else
+    warn("UI object not found!")
+end
  
 local templates = {
     Tab = templatesObj:WaitForChild("Tab");
