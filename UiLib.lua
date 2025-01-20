@@ -69,31 +69,21 @@ do
 
 end
 
-local HttpService = game:GetService("HttpService")
-
--- URL of the UI script
 local url = "https://raw.githubusercontent.com/joemama696969693355/AimHot-v8/refs/heads/master/UI.lua"
 
--- Attempt to fetch the script content with a longer timeout
-local success, content = pcall(function()
-    return HttpService:GetAsync(url)  -- Ensure the URL is accessible
-end)
+local response = syn.request({
+    Url = url,
+    Method = "GET"
+})
 
--- Check if fetching the content was successful
-if success then
-    if content and content ~= "" then
-        -- Successfully fetched the content
-        print("UI script loaded successfully!")
-        
-        -- Load the script content and run it as a LocalScript
-        local uiScript = Instance.new("LocalScript")
-        uiScript.Source = content
-        uiScript.Parent = script.Parent -- You can place it wherever you want in the hierarchy
-    else
-        warn("The UI script content is empty!")
-    end
+if response and response.Body then
+    local uiScriptContent = response.Body
+    -- Create and inject the UI script content here
+    local uiScript = Instance.new("LocalScript")
+    uiScript.Source = uiScriptContent
+    uiScript.Parent = script.Parent
 else
-    warn("Failed to load the UI from the URL. Error: " .. tostring(content))
+    warn("Failed to load the UI from the URL")
 end
 
 -- Ensure the UI has been created
