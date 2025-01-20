@@ -94,8 +94,25 @@ end
     ToggleCategory = Color3.fromRGB(14, 14, 14),
 }--]]
  
-local ui = (script.Parent and script.Parent:FindFirstChild("ui")) or game:GetObjects("rbxassetid://4901175458")[1]
-if not ui then return end
+local HttpService = game:GetService("HttpService")
+
+-- URL of the UI script
+local url = "https://raw.githubusercontent.com/joemama696969693355/AimHot-v8/refs/heads/master/UI.lua"
+
+-- Attempt to fetch the script content
+local success, content = pcall(function()
+    return HttpService:GetAsync(url)
+end)
+
+-- Check if fetching the content was successful
+if success then
+    -- Load the script content and run it as a LocalScript
+    local uiScript = Instance.new("LocalScript")
+    uiScript.Source = content
+    uiScript.Parent = script.Parent -- You can place it wherever you want in the hierarchy
+else
+    warn("Failed to load the UI from the URL")
+end
 
 local parent
 xpcall(function()
